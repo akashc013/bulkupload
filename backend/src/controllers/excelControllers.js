@@ -4,6 +4,7 @@ import ShipmentService from '../services/shipmentService.js';
 import ExcelParser from '../utils/excelParser.js';
 import Location from '../models/locationModel.js';
 import Shipment from '../models/shipmentModel.js';
+import AppError from '../utils/appError.js';
 
 // export const uploadExcel = async (req, res, next) => {
 //   if (!req.file) {
@@ -39,7 +40,6 @@ export const uploadExcel = async (req, res, next) => {
   }
 
   try {
-    
     await bullService.enqueueExcelProcessing(req.file.key);
 
     res
@@ -54,6 +54,9 @@ export const uploadExcel = async (req, res, next) => {
 export const getAllShipments = async (req, res, next) => {
   try {
     const allShipments = await Shipment.find();
+    if (allShipments.length === 0) {
+      return res.status(404).json({ error: 'No shipments found.' });
+    }
     res.status(200).json({ status: 'success', data: allShipments });
   } catch (error) {
     console.error('Error fetching shipments:', error);

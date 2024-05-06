@@ -11,12 +11,12 @@ const shipmentSchema = new mongoose.Schema(
     expectedDeliveryDate: { type: Date, required: true },
     incoterm: { type: String, required: true },
     sourceLocation: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: 'Location',
       required: true,
     },
     destinationLocation: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: 'Location',
       required: true,
     },
@@ -30,15 +30,16 @@ const shipmentSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
-shipmentSchema.pre('save', async function (next) {
-  try {
-    await shipmentSchemaValidation.validateAsync(this.toObject());
-    next();
-  } catch (error) {
-    console.log('Error in validation: ', error);
-    throw error;
-  }
-});
+
+// shipmentSchema.pre('save', async function (next) {
+//   try {
+//     await shipmentSchemaValidation.validateAsync(this.toObject());
+//     next();
+//   } catch (error) {
+//     console.log('Error in validation: ', error);
+//     throw error;
+//   }
+// });
 
 shipmentSchema.pre(/^find/, function (next) {
   this.populate('sourceLocation').populate('destinationLocation');

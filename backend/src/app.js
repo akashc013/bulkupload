@@ -2,30 +2,11 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import cors from 'cors';
 import express from 'express';
+import helmet from 'helmet';
 import morgan from 'morgan';
+import globalErrorHandler from './controllers/errorController.js';
 import excelRoutes from './routes/excelRoutes.js';
-// import { redisOptions } from './server.js';
-
-// import Queue from 'bull';
-// import {
-//   ExpressAdapter,
-//   createBullBoard,
-//   BullAdapter,
-// } from '@bull-board/express/bull';
-
-// Create a new queue with the Redis connection options
-// const queuesList = ['burger'];
-
-// const serverAdapter = new ExpressAdapter();
-// serverAdapter.setBasePath('/admin/queues');
-
-// const queues = queuesList
-//   .map((qs) => new Queue(qs, redisOptions))
-//   .map((q) => new BullAdapter(q));
-// const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-//   queues,
-//   serverAdapter: serverAdapter,
-// });
+import AppError from './utils/appError.js';
 
 const app = express();
 
@@ -36,9 +17,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.options('*', cors());
 app.use(compression());
+app.use(helmet());
 
 // ROUTES
 app.use('/api/excel', excelRoutes);
-// app.use('/admin/queues', serverAdapter.getRouter());
+
+app.all('*', (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
+});
+
+app.use(globalErrorHandler);
 
 export default app;

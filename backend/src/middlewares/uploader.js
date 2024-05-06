@@ -2,6 +2,7 @@ import multer from 'multer';
 import multerS3 from 'multer-s3';
 import path from 'path';
 import S3Client, { S3BucketName } from '../config/s3Config.js';
+import AppError from '../utils/appError.js';
 
 const multerStorage = multer.memoryStorage();
 
@@ -31,7 +32,10 @@ export const uploadS3 = multer({
     if (extname && mimetype) {
       cb(null, true);
     } else {
-      cb(new Error('Only Excel files (xlsx, xls, csv) are allowed.'), false);
+      cb(
+        new AppError('Only Excel files (xlsx, xls, csv) are allowed.', 400),
+        false
+      );
     }
   },
 });

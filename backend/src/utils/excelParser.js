@@ -1,6 +1,7 @@
 import xlsx from 'xlsx';
 import Location from '../models/locationModel.js';
 import Shipment from '../models/shipmentModel.js';
+import AppError from './appError.js';
 
 class ExcelParser {
   constructor(S3BufferData = '') {
@@ -62,31 +63,29 @@ class ExcelParser {
         }
 
         // Create a new shipment object with only the required fields
-        const shipment = new Shipment({
+        const shipment = {
           shipmentType,
           orderNumber,
           orderType,
           primaryMode,
           expectedDeliveryDate: new Date(expectedDeliveryDate),
           incoterm,
-          sourceLocation: sourceLocation._id,
-          destinationLocation: destinationLocation._id,
+          sourceLocation: sourceLocation._id.toString(),
+          destinationLocation: destinationLocation._id.toString(),
           cargoType,
           materialCode,
           quantity,
           quantityUnit,
           shipmentNumber,
-        });
+        };
 
-        // Save the shipment to MongoDB
-        const savedShipment = await shipment.save();
-        processedShipments.push(savedShipment);
+        processedShipments.push(shipment);
       }
 
       return processedShipments;
     } catch (error) {
       console.error(error);
-      throw new Error('Error saving shipment data to MongoDB.');
+      return next(new AppError('Error saving shipment data to MongoDB.', 500));
     }
   }
 
