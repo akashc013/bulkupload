@@ -7,11 +7,14 @@ import morgan from 'morgan';
 import globalErrorHandler from './controllers/errorController.js';
 import excelRoutes from './routes/excelRoutes.js';
 import AppError from './utils/appError.js';
+import configTest from '../config.test.js';
 
 const app = express();
 
 // MIDDLEWARES
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
